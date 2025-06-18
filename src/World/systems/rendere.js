@@ -1,11 +1,12 @@
-import { WebGLRenderer } from "three";
+import { PCFSoftShadowMap, WebGLRenderer } from "three";
 
-function createRenderer () {
-	const renderer = new WebGLRenderer({ antialias: true}); 
+function createRenderer() {
+	const renderer = new WebGLRenderer({ antialias: true });
 	renderer.physicallyCorrectLights = true;
-
+	renderer.shadowMap.enabled = true;
+	renderer.shadowMap.type = PCFSoftShadowMap;
 	renderer.setAnimationLoop(() => {
-		renderer.render(scene,camera);
+		renderer.render(scene, camera);
 	});
 
 	return renderer;

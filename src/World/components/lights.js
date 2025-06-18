@@ -1,29 +1,40 @@
-import { DirectionalLight, MathUtils } from "three";
+import { AmbientLight, DirectionalLight, HemisphereLight, MathUtils, PointLight, SpotLight } from "three";
 
 
-function createLights(){
-	const radius = 1;
-	const height = 1;
-	const light = new DirectionalLight('0xffffff',2);
-	light.position.set(radius,height,1);
-	light.target.position.set(10,0,0)
+function createLights() {
+	const radius = 10;
+	const height = 10;
+	const directionalLight = new DirectionalLight(0xffffff, 1);
+	const ambientLight = new AmbientLight('white', 0.5);
+	directionalLight.position.set(5, 10, 7);
+	directionalLight.castShadow = true;
+	directionalLight.shadow.mapSize.width = 1024;
+	directionalLight.shadow.mapSize.height = 1024;
+	directionalLight.shadow.camera.near = 0.5;
+	directionalLight.shadow.camera.far = 50;
+	directionalLight.shadow.camera.left = -10;
+	directionalLight.shadow.camera.right = 10;
+	directionalLight.shadow.camera.top = 10;
+	directionalLight.shadow.camera.bottom = -10;
+	// directionalLight.position.set(radius,height,10);
+	//	light.target.position.set(10,0,0)
 
 
-	light.radius = radius;
-	light.height = height;
-	light.angle = 0; 
-	light.speed = MathUtils.degToRad(15);
+	directionalLight.radius = radius;
+	directionalLight.height = height;
+	directionalLight.angle = 0;
+	directionalLight.speed = MathUtils.degToRad(15);
 
-	light.tick = (delta) => {
-		light.angle += delta * light.speed;
+	directionalLight.tick = (delta) => {
+		directionalLight.angle += delta * directionalLight.speed;
 
-		light.position.x = light.radius * Math.cos(light.angle);
-		light.position.z = light.radius * Math.sin(light.angle);
+		directionalLight.position.x = directionalLight.radius * Math.cos(directionalLight.angle);
+		directionalLight.position.z = directionalLight.radius * Math.sin(directionalLight.angle);
 
-		light.position.y = light.height;
+		directionalLight.position.y = directionalLight.height;
 	}
-	
-	return light;
+
+	return { directionalLight, ambientLight };
 }
 
 export { createLights };

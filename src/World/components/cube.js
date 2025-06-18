@@ -1,9 +1,23 @@
-import { BoxGeometry, MathUtils, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshPhongMaterial, MeshStandardMaterial } from "three";
+import { BoxGeometry, MathUtils, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshPhongMaterial, MeshStandardMaterial, SRGBColorSpace, TextureLoader } from "three";
+
+function createMaterial() {
+
+	const textureLoader = new TextureLoader();
+	const texture = textureLoader.load('assets/textures/lightgold_albedo.png')
+	console.log("loaded texture is: ", texture)
+	texture.colorSpace = SRGBColorSpace;
+	
+
+	const material = new MeshStandardMaterial({map: texture});
+
+	return material;
+
+}
 
 function createCube(){
-	const geometry =  new BoxGeometry(2,2,2, 20, 20, 20);
+	const geometry =  new BoxGeometry(10,10,10);
 
-	const material = new MeshStandardMaterial({color: "lime", wireframeLinewidth: 20 });
+	const material = createMaterial(); 	
 
 	const cube = new Mesh(geometry, material);
 
