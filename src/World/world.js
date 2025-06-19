@@ -11,12 +11,15 @@ import { newLight } from "./components/lamp.js";
 import { createDesk } from "./components/createDesk.js";
 import { createAxesHelper, createGridHelper } from "./components/helpers.js";
 import { createFloor } from "./components/floor.js";
+import { Color } from "three";
+import gsap from "gsap";
 
 let camera;
 let scene;
 let renderer;
 let loop;
 let controls;
+
 
 class World {
 
@@ -29,17 +32,132 @@ class World {
 		container.append(renderer.domElement)
 
 		const floor = createFloor(40, 40)
-		floor.position.y = -3
+		floor.position.y = -5
+		const desk = createDesk();	
+		desk.position.y = -0.25;
 		const { directionalLight, ambientLight } = createLights();
-		const lamp = newLight();
-		controls.target.copy(lamp.position)
+		const {lampGroup, spotLight} = newLight();
+		controls.target.copy(lampGroup.position)
 		console.log(loop.updateables)
-		scene.add(lamp, floor, directionalLight, ambientLight);
-		// loop.updateables.push(controls, lamp, directionalLight);
-		loop.updateables.push(controls, lamp);
+		scene.add(desk,lampGroup, floor, directionalLight, ambientLight);
+		// loop.updateables.push(controls, lampGroup, directionalLight);
+		loop.updateables.push(controls,lampGroup);
 		const resizer = new Resizer(camera, renderer, container);
 		scene.add(createAxesHelper(), createGridHelper());
+
+		this.desk = desk;
+        this.lampGroup = lampGroup;
+        this.spotLight = spotLight; // The actual light source for toggling
+        this.bulbMesh = lampGroup.getObjectByName("LightBulb"); // Get the bulb mesh by name
+		
+		this._initPartInfoPanel();
+
 	}
+
+	
+    _initPartInfoPanel() {
+        const partInfoPanel = document.createElement('div');
+        partInfoPanel.id = 'partInfoPanel';
+        document.body.appendChild(partInfoPanel);
+
+        // Style the panel (could also be in style.css)
+        partInfoPanel.style.cssText = `
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            font-family: sans-serif;
+            font-size: 14px;
+            display: none;
+            pointer-events: none;
+            z-index: 100;
+        `;
+    }
+    
+    toggleLight(lightMesh, targetState) {
+        this.spotLight.visible = targetState; // Toggle actual light source
+        // Update bulb mesh emissive color
+        if (lightMesh.material && lightMesh.material.emissive) {
+            if (this.spotLight.visible) {
+                lightMesh.material.emissive.setHex(lightMesh.userData.onStateEmmisiveColor || 0xFFFF88);
+            } else {
+                lightMesh.material.emissive.setHex(lightMesh.userData.offStateEmmisiveHex || 0x000000); // Black for off
+            }
+        }
+        console.log('Light is now:', this.spotLight.visible ? 'ON' : 'OFF');
+
+        if (this._onLightToggleCallback) {
+            this._onLightToggleCallback(this.spotLight.visible);
+        }
+    }
+
+    setLampLight( hexColor){
+        this.spotLight.visible = true; // Toggle actual light source
+
+        console.log(hexColor)
+        if (this.spotLight){
+            this.spotLight.color.setHex(new Color(hexColor).getHex())
+            console.log("spotlight color changed ")
+        }
+
+
+     if (this.bulbMesh && this.bulbMesh.material && this.bulbMesh.material.emissive) {
+            const newEmissiveColor = new Color(hexColor).getHex();
+            this.bulbMesh.material.emissive.setHex(newEmissiveColor);
+            this.bulbMesh.userData.onStateEmmisiveColor = newEmissiveColor;
+        }
+    }
+
+    setLampIntensity(num){
+        this.spotLight.visible = true;
+        if (this.spotLight){
+            this.spotLight.intensity = num;
+        }
+    }
+ setDrawerSlide(drawerMesh, value) {
+        const initialZ = drawerMesh.userData.initialZPosition;
+        drawerMesh.position.z = initialZ + value;
+        drawerMesh.userData.isOpen = (value > (drawerMesh.userData.openDistance * 0.1));
+    }
+
+    toggleDrawer(drawerMesh) {
+        const isOpen = drawerMesh.userData.isOpen;
+        const initialZ = drawerMesh.userData.initialZPosition;
+        const openDistance = drawerMesh.userData.openDistance;
+
+        if (!isOpen) {
+            gsap.to(drawerMesh.position, {
+                z: initialZ + openDistance,
+                duration: 0.5,
+                ease: "power2.out",
+                onComplete: () => {
+                    drawerMesh.userData.isOpen = true;
+                }
+            });
+        } else {
+            gsap.to(drawerMesh.position, {
+                z: initialZ,
+                duration: 0.5,
+                ease: "power2.out",
+                onComplete: () => {
+                    drawerMesh.userData.isOpen = false;
+                }
+            });
+        }
+        // Update GUI if a callback is registered
+        if (this._onDrawerToggleCallback) {
+             this._onDrawerToggleCallback(drawerMesh.name, drawerMesh.userData.isOpen ? openDistance : 0);
+        }
+    }
+
+    toggleLampAnimation(value) {
+        if (value){
+            
+        }
+    }
 
 	render() {
 		renderer.render(scene, camera);
@@ -52,6 +170,47 @@ class World {
 	stop() {
 		loop.stop();
 	}
+
+	 getScene() {
+        return scene;
+    }
+
+    getCamera() {
+        return camera;
+    }
+
+    getRenderer() {
+        return renderer;
+    }
+
+    getDesk() {
+        return this.desk;
+    }
+
+    getLampBulb() {
+        return this.bulbMesh; // The mesh you click
+    }
+
+    getPointLight() {
+        return this.spotLight; // The actual light source
+    }
+
+	getScene() {
+        return scene;
+    }
+
+    getCamera() {
+        return camera;
+    }
+
+    getRenderer() {
+        return renderer;
+    }
+
+    getControls() {
+        return controls;
+    }
+
 
 }
 

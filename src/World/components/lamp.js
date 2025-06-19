@@ -14,30 +14,35 @@ import {
 } from 'three';
 import { createDesk } from './createDesk';
 import { createMaterial } from '../util/createMeshWithTexture';
+import { degToRad } from 'three/src/math/MathUtils.js';
 
 
 function newLight() {
 	const lampGroup = new Group();
-	const metalMaterial = createMaterial('carbon-fiber_albedo.png')
+	const metalMaterial = createMaterial('synth-rubber-albedo.png')
+	const ballMaterial = createMaterial('lightgold_albedo.png')
+	ballMaterial.metalMaterial = 1
+	ballMaterial.roughness = 0
 	metalMaterial.metalness = 0.8;
 	metalMaterial.roughness = 0.2;
 	// new MeshStandardMaterial({ color: 0x444444, metalness: 0.8, roughness: 0.2 });
 	const shadeMaterial = new MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.6, side: DoubleSide });
 
-	const desk = createDesk()
-	desk.position.y = -0.25;
-	lampGroup.add(desk)
+	// const desk = createDesk()
+	// desk.position.y = -0.25;
+	// lampGroup.add(desk)
 	// Base
 	const base = new Mesh(
 		new CylinderGeometry(0.6, 0.6, 0.2, 32),
 		metalMaterial
 	);
+	base.castShadow = true;
 	base.position.set(0, 0.1, 0);
 	lampGroup.add(base);
 
 	const lowerElbow = new Mesh(
 		new SphereGeometry(0.15, 16, 16),
-		shadeMaterial
+		ballMaterial
 	);
 	lowerElbow.position.set(0, 0.3, 0)
 	lampGroup.add(lowerElbow)
@@ -85,16 +90,16 @@ function newLight() {
 	upperElbow.position.set(0, 0, 0); // Position relative to lowerArm, at its top
 	lampHeadPivot.add(upperElbow);
 
+	const lampMaterial = createMaterial('carbon-fiber_albedo.png')
+	lampMaterial.side = DoubleSide
 	// Lamp head (hollowed cone)
 	const lampHead = new Mesh(
-		new ConeGeometry(0.6, 1, 32, 1, true), // The 'true' makes it open-ended
-		shadeMaterial
+		new ConeGeometry(0.6, 1, 32, 1, true), 
+		lampMaterial
 	);
 	lampHead.castShadow = true
 	lampHead.rotation.z = Math.PI / 2;
 	lampHead.position.set(0.5, 0, 0); // Position relative to its pivot
-	lampHead.geometry.deleteAttribute('normal'); // Remove normals for flat shading or recompute if needed
-	lampHead.geometry.deleteAttribute('uv');    // Remove UVs if not texturing
 	lampHeadPivot.add(lampHead);
 
 	const spotLight = new SpotLight(0xffffff, 5, 7, Math.PI / 6, 0.4, 1);
@@ -117,7 +122,12 @@ function newLight() {
 		new SphereGeometry(0.08, 16, 16),
 		bulbMaterial
 	);
+	bulb.name = "LightBulb"
 	bulb.position.set(0.3, 0, 0);
+	bulb.userData.isLightBulb = true;
+    bulb.userData.lightSource = spotLight; // Reference to the actual light
+    bulb.userData.originalEmissiveHex = bulbMaterial.emissive.getHex();
+    bulb.userData.offStateEmmisiveHex = 0x000000;
 	lampHeadPivot.add(bulb);
 	lampHeadPivot.add(spotLight);
 
@@ -148,7 +158,8 @@ function newLight() {
 
 	};
 	lampGroup.position.set(0, 0, 0)
-	return lampGroup;
+	lampGroup.rotation.y = degToRad(-90)
+	return {lampGroup, spotLight};
 }
 
 export { newLight }

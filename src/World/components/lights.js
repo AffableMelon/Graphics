@@ -12,9 +12,16 @@ function createLights() {
 	directionalLight.position.set(5, 10, 0);
 	directionalLight.target.position.set(0, 0, 0)
 	directionalLight.castShadow = true;
+	directionalLight.shadow.mapSize.width = 1024; // Default is 512
+    directionalLight.shadow.mapSize.height = 1024; // Default is 512
+
 	// directionalLight.position.set(radius,height,10);
 	//	light.target.position.set(10,0,0)
-
+const shadowMapSize = 10; // Adjust this value to fit your scene content
+    directionalLight.shadow.camera.left = -shadowMapSize;
+    directionalLight.shadow.camera.right = shadowMapSize;
+    directionalLight.shadow.camera.top = shadowMapSize;
+    directionalLight.shadow.camera.bottom = -shadowMapSize;
 
 	directionalLight.radius = radius;
 	directionalLight.height = height;
