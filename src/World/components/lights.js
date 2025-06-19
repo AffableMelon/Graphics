@@ -1,21 +1,17 @@
-import { AmbientLight, DirectionalLight, HemisphereLight, MathUtils, PointLight, SpotLight } from "three";
+import { AmbientLight, DirectionalLight, DirectionalLightHelper, HemisphereLight, MathUtils, PointLight, SpotLight } from "three";
 
 
 function createLights() {
 	const radius = 10;
 	const height = 10;
 	const directionalLight = new DirectionalLight(0xffffff, 1);
-	const ambientLight = new AmbientLight('white', 0.5);
-	directionalLight.position.set(5, 10, 7);
+	const ambientLight = new HemisphereLight(0xB1E1FF, 0xB97A20, 2,)
+	const directionLightHelper = new DirectionalLightHelper(directionalLight);
+
+	directionalLight.add(directionLightHelper)
+	directionalLight.position.set(5, 10, 0);
+	directionalLight.target.position.set(0, 0, 0)
 	directionalLight.castShadow = true;
-	directionalLight.shadow.mapSize.width = 1024;
-	directionalLight.shadow.mapSize.height = 1024;
-	directionalLight.shadow.camera.near = 0.5;
-	directionalLight.shadow.camera.far = 50;
-	directionalLight.shadow.camera.left = -10;
-	directionalLight.shadow.camera.right = 10;
-	directionalLight.shadow.camera.top = 10;
-	directionalLight.shadow.camera.bottom = -10;
 	// directionalLight.position.set(radius,height,10);
 	//	light.target.position.set(10,0,0)
 

@@ -7,10 +7,10 @@ import { createRenderer } from "./systems/rendere";
 import { Resizer } from './systems/Resizer.js';
 import { Loop } from "./systems/loop.js";
 import { cameraControls } from "./systems/controls.js";
-import { createController } from "./components/controller.js";
-import { createGiraffe } from "./components/giraffe.js";
 import { newLight } from "./components/lamp.js";
 import { createDesk } from "./components/createDesk.js";
+import { createAxesHelper, createGridHelper } from "./components/helpers.js";
+import { createFloor } from "./components/floor.js";
 
 let camera;
 let scene;
@@ -28,22 +28,17 @@ class World {
 		loop = new Loop(camera, scene, renderer);
 		container.append(renderer.domElement)
 
-		const wall1 = createCube();
-		const cylinder = createCylinder();
+		const floor = createFloor(40, 40)
+		floor.position.y = -3
 		const { directionalLight, ambientLight } = createLights();
-		const desk = createDesk();
 		const lamp = newLight();
-		wall1.position.set(20, 0, 0)
-		// controls.target.copy(lamp.position)
-
+		controls.target.copy(lamp.position)
 		console.log(loop.updateables)
-
-		scene.add();
-		scene.add(lamp, directionalLight, ambientLight);
-		// scene.add(directionalLight, ambientLight);
-		loop.updateables.push(lamp, controls, directionalLight);
-		// loop.updateables.push(wall1, cylinder, controls);
+		scene.add(lamp, floor, directionalLight, ambientLight);
+		// loop.updateables.push(controls, lamp, directionalLight);
+		loop.updateables.push(controls, lamp);
 		const resizer = new Resizer(camera, renderer, container);
+		scene.add(createAxesHelper(), createGridHelper());
 	}
 
 	render() {

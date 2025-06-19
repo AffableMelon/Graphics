@@ -9,7 +9,7 @@ function createCamera() {
 		100, //far clipping
 	);
 
-	camera.position.set(10,-5,50);
+	camera.position.set(10, -5, 20);
 
 	return camera;
 }
