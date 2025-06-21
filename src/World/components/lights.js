@@ -6,9 +6,9 @@ function createLights() {
 	const height = 10;
 	const directionalLight = new DirectionalLight(0xffffff, 1);
 	const ambientLight = new HemisphereLight(0xB1E1FF, 0xB97A20, 2,)
-	const directionLightHelper = new DirectionalLightHelper(directionalLight);
+	// const directionLightHelper = new DirectionalLightHelper(directionalLight);
 
-	directionalLight.add(directionLightHelper)
+	// directionalLight.add(directionLightHelper)
 	directionalLight.position.set(5, 10, 0);
 	directionalLight.target.position.set(0, 0, 0)
 	directionalLight.castShadow = true;

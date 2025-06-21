@@ -1,10 +1,24 @@
 import { BoxGeometry, Group, Mesh, MeshStandardMaterial, SRGBColorSpace, TextureLoader, TorusGeometry } from "three";
-import { createMaterial } from "../util/createMeshWithTexture";
+import { createMaterialNew } from "../util/createMeshWithTexture";
 
 function createDesk() {
-    const deskMaterial = createMaterial('dark-wood-stain_albedo.png');
-    const legDecor = createMaterial('lightgold_albedo.png');
-    const drawerHandleMaterial = new MeshStandardMaterial({ color: 0x8B4513, roughness: 0.7, metalness: 0.1 }); // A simple brown for handles
+    const tableTextureFiles = {
+    albedo: 'table/dark-wood-stain_albedo.webp',
+    normal: 'table/dark-wood-stain_normal-ogl.webp',
+    metallic: 'table/dark-wood-stain_metalic.webp', 
+    ao: 'table/dark-wood-stain_ao.webp', 
+    height: 'table/dark-wood-stain_height.webp' 
+};
+
+    const decor = {
+        albedo: 'light-gold-unity/lightgold_albedo.webp',
+        normal: 'light-gold-unity/lightgold_normal-ogl.webp',
+        metallic: 'light-gold-unity/lightgold_metalic.webp', 
+    };
+    const deskMaterial = createMaterialNew(tableTextureFiles);
+    
+    const legDecor = createMaterialNew(decor);
+
 
     // Desk Group
     const deskGroup = new Group();
@@ -94,7 +108,7 @@ deskLegGroup.name = "DeskLegs";
 
         // drawer handles 
         const handleGeometry = new BoxGeometry(drawerWidth * 0.4, 0.1, 0.1);
-        const handle = new Mesh(handleGeometry, drawerHandleMaterial);
+        const handle = new Mesh(handleGeometry, legDecor);
         handle.position.set(0, 0, drawerDepth / 2 + 0.05); 
 		  handle.userData.isDrawer = true;
         handle.userData.drawerMesh = drawer;

@@ -1,6 +1,5 @@
 import { createCamera } from "./components/camera"
-import { createCube } from "./components/cube";
-import { createCylinder } from "./components/cylinder.js";
+
 import { createLights } from "./components/lights.js";
 import { createScene } from "./components/scene";
 import { createRenderer } from "./systems/rendere";
@@ -9,7 +8,6 @@ import { Loop } from "./systems/loop.js";
 import { cameraControls } from "./systems/controls.js";
 import { newLight } from "./components/lamp.js";
 import { createDesk } from "./components/createDesk.js";
-import { createAxesHelper, createGridHelper } from "./components/helpers.js";
 import { createFloor } from "./components/floor.js";
 import { Color } from "three";
 import gsap from "gsap";
@@ -40,15 +38,16 @@ class World {
 		controls.target.copy(lampGroup.position)
 		console.log(loop.updateables)
 		scene.add(desk,lampGroup, floor, directionalLight, ambientLight);
-		// loop.updateables.push(controls, lampGroup, directionalLight);
-		loop.updateables.push(controls,lampGroup);
+		loop.updateables.push(controls, lampGroup, directionalLight);
+		// loop.updateables.push(controls,lampGroup);
 		const resizer = new Resizer(camera, renderer, container);
-		scene.add(createAxesHelper(), createGridHelper());
+		// scene.add(createAxesHelper(), createGridHelper());
 
 		this.desk = desk;
         this.lampGroup = lampGroup;
         this.spotLight = spotLight; // The actual light source for toggling
         this.bulbMesh = lampGroup.getObjectByName("LightBulb"); // Get the bulb mesh by name
+        this.loop = loop
 		
 		this._initPartInfoPanel();
 
@@ -123,39 +122,16 @@ class World {
         drawerMesh.userData.isOpen = (value > (drawerMesh.userData.openDistance * 0.1));
     }
 
-    toggleDrawer(drawerMesh) {
-        const isOpen = drawerMesh.userData.isOpen;
-        const initialZ = drawerMesh.userData.initialZPosition;
-        const openDistance = drawerMesh.userData.openDistance;
 
-        if (!isOpen) {
-            gsap.to(drawerMesh.position, {
-                z: initialZ + openDistance,
-                duration: 0.5,
-                ease: "power2.out",
-                onComplete: () => {
-                    drawerMesh.userData.isOpen = true;
-                }
-            });
-        } else {
-            gsap.to(drawerMesh.position, {
-                z: initialZ,
-                duration: 0.5,
-                ease: "power2.out",
-                onComplete: () => {
-                    drawerMesh.userData.isOpen = false;
-                }
-            });
-        }
-        // Update GUI if a callback is registered
-        if (this._onDrawerToggleCallback) {
-             this._onDrawerToggleCallback(drawerMesh.name, drawerMesh.userData.isOpen ? openDistance : 0);
-        }
-    }
 
     toggleLampAnimation(value) {
-        if (value){
-            
+        if (!value){
+            this.lampGroup.userData.isPaused = true
+            const currentTime = performance.now() * 0.001;
+            this.lampGroup.userData.animationOffset = (currentTime - this.lampGroup.userData.lastFrameTime);
+            this.lampGroup.userData.lastFrameTime = currentTime;
+        }else{
+            this.lampGroup.userData.isPaused = false
         }
     }
 

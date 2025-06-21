@@ -8,6 +8,7 @@ const guiParams = {
   lightOn: true,
   lightColor: "#ffffff",
   lampIntensity: 5,
+  lampAnimation: true,
   cameraReset: () => {},
 };
 
@@ -19,10 +20,7 @@ function main() {
   const bulbMesh = world.getLampBulb();
   const pointLight = world.getPointLight();
   const desk = world.getDesk();
-  const controls = world.getControls(); // Assuming you add a getControls method to World
-
-  // Pass the interactive elements and GUI params to the World instance for internal management
-  // Or, setup GUI here and pass relevant objects to it. Let's set it up here.
+  const controls = world.getControls(); 
 
   setupGUI(world, desk, bulbMesh, pointLight, controls);
 
@@ -62,11 +60,13 @@ function setupGUI(world, desk, bulbMesh, pointLight, controls) {
       world.setLampLight(value);
     });
   lightFolder
-    .add(guiParams, "lampIntensity", 0, 100) // Adjust range as needed
-    .name("Lamp Light Intensity")
+    .add(guiParams, "lampIntensity", 0, 100)
     .onChange((value) => {
       world.setLampIntensity(value);
     });
+  lightFolder.add(guiParams,"lampAnimation").name("Animation On/Off").onChange((value) => {
+    world.toggleLampAnimation(value)
+  })
 
   // Desk drawer stuff
   const deskFolder = gui.addFolder("Desk Drawer Controls");

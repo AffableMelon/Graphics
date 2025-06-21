@@ -9,29 +9,41 @@ import {
 	Vector3,
 	DoubleSide,
 	SpotLight,
-	SpotLightHelper,
 	Object3D
 } from 'three';
-import { createDesk } from './createDesk';
-import { createMaterial } from '../util/createMeshWithTexture';
+import {  createMaterialNew } from '../util/createMeshWithTexture';
 import { degToRad } from 'three/src/math/MathUtils.js';
 
 
 function newLight() {
-	const lampGroup = new Group();
-	const metalMaterial = createMaterial('synth-rubber-albedo.png')
-	const ballMaterial = createMaterial('lightgold_albedo.png')
-	ballMaterial.metalMaterial = 1
-	ballMaterial.roughness = 0
-	metalMaterial.metalness = 0.8;
-	metalMaterial.roughness = 0.2;
-	// new MeshStandardMaterial({ color: 0x444444, metalness: 0.8, roughness: 0.2 });
-	const shadeMaterial = new MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.6, side: DoubleSide });
+	    const rubberized = {
+    albedo: 'synth-rubber-unreal-engine/synth-rubber-albedo.webp',
+    normal: 'synth-rubber-unreal-engine/synth-rubber-normal.webp',
+    metallic: 'synth-rubber-unreal-engine/synth-rubber-metalness.webp', 
+    roughness: 'synth-rubber-unreal-engine/synth-rubber-roughness.webp' 
+};
+	const lampBodyTexture = {
+    albedo: 'worn-metal-studs-unity/worn-metal-studs_albedo.webp',
+    normal: 'worn-metal-studs-unity/worn-metal-studs_normal-ogl.webp',
+    metallic: 'worn-metal-studs-unity/worn-metal-studs_metalic.webp', 
+    ao: 'worn-metal-studs-unity/worn-metal-studs_ao.webp', 
+    height: 'worn-metal-studs-unity/worn-metal-studs_height.webp' 
+};
 
-	// const desk = createDesk()
-	// desk.position.y = -0.25;
-	// lampGroup.add(desk)
-	// Base
+
+const hinge2 = {
+    albedo: 'light-gold-unity/lightgold_albedo.webp',
+    normal: 'light-gold-unity/lightgold_normal-ogl.webp',
+    metallic: 'light-gold-unity/lightgold_metalic.webp', 
+};
+
+
+	const lampGroup = new Group();
+	const metalMaterial = createMaterialNew(rubberized)
+	const ballMaterial = createMaterialNew(hinge2)
+	const lampMaterial = createMaterialNew(lampBodyTexture)
+
+	
 	const base = new Mesh(
 		new CylinderGeometry(0.6, 0.6, 0.2, 32),
 		metalMaterial
@@ -90,7 +102,6 @@ function newLight() {
 	upperElbow.position.set(0, 0, 0); // Position relative to lowerArm, at its top
 	lampHeadPivot.add(upperElbow);
 
-	const lampMaterial = createMaterial('carbon-fiber_albedo.png')
 	lampMaterial.side = DoubleSide
 	// Lamp head (hollowed cone)
 	const lampHead = new Mesh(
@@ -107,9 +118,9 @@ function newLight() {
 	spotLight.castShadow = true
 	// Create a target object that stays in front of the lamp head
 	const lightTarget = new Object3D();
-	lightTarget.position.set(1, 0, 0); // Forward along the local X axis of the cone
-	lampHeadPivot.add(lightTarget);    // Add it to the rotating group
-	spotLight.target = lightTarget;    // Tell the light to follow this
+	lightTarget.position.set(1, 0, 0); 
+	lampHeadPivot.add(lightTarget);   
+	spotLight.target = lightTarget;    
 	const bulbMaterial = new MeshStandardMaterial({
 		color: 0xfffffc,
 		emissive: 0xfffff5,
@@ -125,15 +136,14 @@ function newLight() {
 	bulb.name = "LightBulb"
 	bulb.position.set(0.3, 0, 0);
 	bulb.userData.isLightBulb = true;
-    bulb.userData.lightSource = spotLight; // Reference to the actual light
+    bulb.userData.lightSource = spotLight; 
     bulb.userData.originalEmissiveHex = bulbMaterial.emissive.getHex();
     bulb.userData.offStateEmmisiveHex = 0x000000;
 	lampHeadPivot.add(bulb);
 	lampHeadPivot.add(spotLight);
 
-	// Optional: Helper
-	const spotLightHelper = new SpotLightHelper(spotLight);
-	lampHeadPivot.add(spotLightHelper);
+	// const spotLightHelper = new SpotLightHelper(spotLight);
+	// lampHeadPivot.add(spotLightHelper);
 
 
 	// Center the whole group (still a good idea for initial placement)
@@ -145,6 +155,7 @@ function newLight() {
 	lampGroup.lowerArmPivot = lowerArmPivot;
 	lampGroup.upperArmPivot = upperArmPivot;
 	lampGroup.lampHeadPivot = lampHeadPivot;
+	
 	// lampGroup.pointLight = pointLight; // Store light reference too if you want to animate its properties
 	lampGroup.tick = function(delta) {
 		const time = performance.now() * 0.001; // Get time in seconds
