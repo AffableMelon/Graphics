@@ -155,21 +155,42 @@ const hinge2 = {
 	lampGroup.lowerArmPivot = lowerArmPivot;
 	lampGroup.upperArmPivot = upperArmPivot;
 	lampGroup.lampHeadPivot = lampHeadPivot;
+	lampGroup.userData.isPaused = false
+	lampGroup.userData.animationOffset = 0;
+	lampGroup.userData.lastFrameTime = performance.now() * 0.001;
 	
 	// lampGroup.pointLight = pointLight; // Store light reference too if you want to animate its properties
 	lampGroup.tick = function(delta) {
-		const time = performance.now() * 0.001; // Get time in seconds
+		const currentTime = performance.now() * 0.001;
+
+		 const deltaTime = currentTime - this.userData.lastFrameTime;
+    this.userData.lastFrameTime = deltaTime; // Update for the next frame
+
+    // If paused, don't update the animationOffset.
+    // The animation will effectively hold its current position.
+    if (this.userData.isPaused) {
+        // If you want to log, keep it, but it doesn't affect animation logic
+        console.log("lamp is currently paused: ", this.userData.isPaused);
+        return; // Exit the function, no rotation updates
+    }
+
+    // animationTime is the total time the animation should have progressed
+    // It sums up deltaTime for all active frames.
+    const animationTime = currentTime - this.userData.animationOffset;
+
+		
 		// lower arm animation
-		this.lowerArmPivot.rotation.z = Math.sin(time * 0.5) * 0.5 + Math.PI / 10;
+		this.lowerArmPivot.rotation.z = Math.sin(animationTime * 0.5) * 0.5 + Math.PI / 10;
 		// upper arm animation
-		this.upperArmPivot.rotation.z = Math.sin(time * 0.8) * 0.7 - Math.PI / 4;
+		this.upperArmPivot.rotation.z = Math.sin(animationTime * 0.8) * 0.7 - Math.PI / 4;
 		// head animation
-		this.lampHeadPivot.rotation.y = Math.cos(time * 0.6) * 0.4;
-		this.lampHeadPivot.rotation.x = Math.sin(time * 0.9) * 0.2;
+		this.lampHeadPivot.rotation.y = Math.cos(animationTime * 0.6) * 0.4;
+		this.lampHeadPivot.rotation.x = Math.sin(animationTime * 0.9) * 0.2;
 
 	};
 	lampGroup.position.set(0, 0, 0)
 	lampGroup.rotation.y = degToRad(-90)
+	lampGroup.name = "Lamp"
 	return {lampGroup, spotLight};
 }
 
