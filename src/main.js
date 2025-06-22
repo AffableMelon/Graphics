@@ -104,11 +104,7 @@ function setupGUI(world, desk, bulbMesh, pointLight, controls, camera) {
 		.onChange((value) => {
 			world.toggleCameraLoop(value);
 		})
-	// cameraFolder.add(guiParams, "cameraSpeed", 0.01, 0.5)
-	// 	.name("Rotation Speed")
-	// 	.onChange((value) => {
-	// 		world.setCameraRotationSpeed(value); // Call the method on the world instance
-	// 	});
+
 	gui.add(guiParams, "cameraReset").name("Reset Camera View");
 }
 

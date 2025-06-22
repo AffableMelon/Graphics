@@ -116,7 +116,7 @@ const hinge2 = {
 	const spotLight = new SpotLight(0xffffff, 5, 7, Math.PI / 6, 0.4, 1);
 	spotLight.position.set(0.3, 0, 0);
 	spotLight.castShadow = true
-	// Create a target object that stays in front of the lamp head
+	//target for lamp head
 	const lightTarget = new Object3D();
 	lightTarget.position.set(1, 0, 0); 
 	lampHeadPivot.add(lightTarget);   
@@ -146,48 +146,41 @@ const hinge2 = {
 	// lampHeadPivot.add(spotLightHelper);
 
 
-	// Center the whole group (still a good idea for initial placement)
+	// Center the whole group 
 	const box = new Box3().setFromObject(lampGroup);
 	const center = box.getCenter(new Vector3());
 	lampGroup.position.sub(center);
 
-	// Store references to the animatable parts for the tick function
 	lampGroup.lowerArmPivot = lowerArmPivot;
 	lampGroup.upperArmPivot = upperArmPivot;
 	lampGroup.lampHeadPivot = lampHeadPivot;
-	lampGroup.userData.isPaused = false
-	lampGroup.userData.animationOffset = 0;
-	lampGroup.userData.lastFrameTime = performance.now() * 0.001;
+
+	lampGroup.userData = {
+    isPaused: false,
+    animationTime: 0
+};
+
+
 	
-	// lampGroup.pointLight = pointLight; // Store light reference too if you want to animate its properties
 	lampGroup.tick = function(delta) {
-		const currentTime = performance.now() * 0.001;
-
-		 const deltaTime = currentTime - this.userData.lastFrameTime;
-    this.userData.lastFrameTime = deltaTime; // Update for the next frame
-
-    // If paused, don't update the animationOffset.
-    // The animation will effectively hold its current position.
     if (this.userData.isPaused) {
-        // If you want to log, keep it, but it doesn't affect animation logic
-        console.log("lamp is currently paused: ", this.userData.isPaused);
-        return; // Exit the function, no rotation updates
+        return;
     }
 
-    // animationTime is the total time the animation should have progressed
-    // It sums up deltaTime for all active frames.
-    const animationTime = currentTime - this.userData.animationOffset;
+    if (this.userData.animationTime === undefined) {
+        this.userData.animationTime = 0;
+    }
 
-		
-		// lower arm animation
-		this.lowerArmPivot.rotation.z = Math.sin(animationTime * 0.5) * 0.5 + Math.PI / 10;
-		// upper arm animation
-		this.upperArmPivot.rotation.z = Math.sin(animationTime * 0.8) * 0.7 - Math.PI / 4;
-		// head animation
-		this.lampHeadPivot.rotation.y = Math.cos(animationTime * 0.6) * 0.4;
-		this.lampHeadPivot.rotation.x = Math.sin(animationTime * 0.9) * 0.2;
+    this.userData.animationTime += delta;
 
-	};
+    const t = this.userData.animationTime;
+
+    this.lowerArmPivot.rotation.z = Math.sin(t * 0.5) * 0.5 + Math.PI / 10;
+    this.upperArmPivot.rotation.z = Math.sin(t * 0.8) * 0.7 - Math.PI / 4;
+    this.lampHeadPivot.rotation.y = Math.cos(t * 0.6) * 0.4;
+    this.lampHeadPivot.rotation.x = Math.sin(t * 0.9) * 0.2;
+};
+
 	lampGroup.position.set(0, 0, 0)
 	lampGroup.rotation.y = degToRad(-90)
 	lampGroup.name = "Lamp"

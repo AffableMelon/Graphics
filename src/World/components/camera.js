@@ -20,55 +20,13 @@ function createCamera() {
 	camera.tick = (delta) => {
 		orbitAngle += orbitSpeed * delta; // advance angle based on delta
 
-		// Update position on XZ plane
+		// Update position on XYZ plane
 		camera.position.x = Math.cos(orbitAngle) * orbitRadius;
-		camera.position.y = Math.abs(Math.sin(orbitAngle) * orbitRadius);
-		camera.position.z = Math.sin(orbitAngle) * orbitRadius * 5;
+		camera.position.y = Math.abs(Math.sin(orbitAngle)) * (orbitRadius + 10 );
+		camera.position.z = Math.sin(orbitAngle) * (orbitRadius + 5);
 
 		camera.lookAt(0, 0, 0); // always look at the center
 	};
-
-	// camera.tick = (delta) => {
-	//
-	// 	const time = performance.now() * 0.001; // time in seconds
-	//
-	// 	const radius = camera.position.length(); // stay at current distance from origin
-	// 	const speed = 0.2; // adjust rotation speed (radians per second)
-	//
-	// 	// Compute new x and z based on circular path
-	// 	const angle = time * speed;
-	//
-	// 	camera.position.x = Math.cos(angle) * radius;
-	// 	camera.position.z = Math.sin(angle) * radius;
-	//
-	// 	camera.lookAt(0, 0, 0); // Always look at the origin
-	// };
-
-	// camera.tick = (delta) => {
-	// 	if (camera.autoRotate) {
-	// 		const distance = camera.position.distanceTo(camera.rotationTarget);
-	// 		// const currentAngle = Math.atan2(camera.position.x - camera.rotationTarget.x, camera.position.z - camera.rotationTarget.z);
-	// 		const newAngle = currentAngle + (camera.rotationSpeed * delta);
-	//
-	// 		camera.position.x = camera.rotationTarget.x + distance * Math.sin(newAngle);
-	//
-	// 		camera.lookAt(camera.rotationTarget);
-	// 	}
-	// };
-	//
-
-	// camera.tick = (delta) => {
-	// 	if (camera.autoRotate) {
-	// 		const distance = camera.position.distanceTo(camera.rotationTarget);
-	// 		const currentAngle = Math.atan2(camera.position.x - camera.rotationTarget.x, camera.position.z - camera.rotationTarget.z);
-	// 		const newAngle = currentAngle + (camera.rotationSpeed * delta);
-	//
-	// 		camera.position.x = camera.rotationTarget.x + distance * Math.sin(newAngle);
-	// 		// camera.position.z = camera.rotationTarget.z + distance * Math.cos(newAngle);
-	//
-	// 		camera.lookAt(camera.rotationTarget);
-	// 	}
-	// };
 
 	return camera;
 }
