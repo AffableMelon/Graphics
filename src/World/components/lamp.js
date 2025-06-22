@@ -48,6 +48,7 @@ const hinge2 = {
 		new CylinderGeometry(0.6, 0.6, 0.2, 32),
 		metalMaterial
 	);
+	base.name = "Thats the base!"
 	base.castShadow = true;
 	base.position.set(0, 0.1, 0);
 	lampGroup.add(base);
@@ -58,45 +59,50 @@ const hinge2 = {
 	);
 	lowerElbow.position.set(0, 0.3, 0)
 	lampGroup.add(lowerElbow)
+	lowerElbow.name = "Hinges to move around"
 
-	// Create a group for the lower arm and everything above it to pivot
+
+	//  a group for the lower arm and everything above it to pivot
 	const lowerArmPivot = new Group();
 	lowerArmPivot.position.set(0, 0.2, 0);
 	lampGroup.add(lowerArmPivot);
+
 
 	// Lower arm
 	const lowerArm = new Mesh(
 		new CylinderGeometry(0.1, 0.1, 2.5, 16),
 		metalMaterial
 	);
+	lowerArm.name = "Lower Arm Handle"
 	// Adjust position relative to its pivot (lowerArmPivot)
-	lowerArm.position.set(0, 1.25, 0); // Half of its height above the pivot
+	lowerArm.position.set(0, 1.25, 0); 
 	lowerArmPivot.add(lowerArm);
-	// Elbow joint (sphere) - now child of lowerArm
+	// Elbow joint (sphere) 
 	const midElbow = lowerElbow.clone()
-	midElbow.position.set(0.0, 1.25 + 0.15, 0); // Position relative to lowerArm, at its top
+	midElbow.position.set(0.0, 1.25 + 0.15, 0);
 	lowerArm.add(midElbow);
 	lowerArm.castShadow = true
 
 	// Create a group for the upper arm and lamp head to pivot from the elbow
 	const upperArmPivot = new Group();
-	upperArmPivot.position.set(0, 1.25 + 0.15, 0); // Position this pivot at the elbow joint
-	lowerArm.add(upperArmPivot); // Make upperArmPivot a child of lowerArm
+	upperArmPivot.position.set(0, 1.25 + 0.15, 0); 
+	lowerArm.add(upperArmPivot); 
 
 	// Upper arm
 	const upperArm = new Mesh(
 		new CylinderGeometry(0.1, 0.1, 1.5, 16),
 		metalMaterial
 	);
-	// Adjust position relative to its pivot (upperArmPivot)
-	upperArm.position.set(0, 0.75, 0); // Half of its height above the pivot
+	upperArm.name = "Upper Arm Handle"
+	upperArm.position.set(0, 0.75, 0);
 	upperArmPivot.add(upperArm);
 	upperArm.castShadow = true
 
 	// Lamp head group for rotation
 	const lampHeadPivot = new Group();
-	lampHeadPivot.position.set(0, 0.75, 0); // Position this pivot at the end of the upper arm
+	lampHeadPivot.position.set(0, 0.75, 0);
 	upperArm.add(lampHeadPivot);
+
 
 	const upperElbow = lowerElbow.clone()
 	upperElbow.position.set(0, 0, 0); // Position relative to lowerArm, at its top
@@ -108,6 +114,7 @@ const hinge2 = {
 		new ConeGeometry(0.6, 1, 32, 1, true), 
 		lampMaterial
 	);
+	lampHead.name = " The main lamp head! "
 	lampHead.castShadow = true
 	lampHead.rotation.z = Math.PI / 2;
 	lampHead.position.set(0.5, 0, 0); // Position relative to its pivot
@@ -160,8 +167,6 @@ const hinge2 = {
     animationTime: 0
 };
 
-
-	
 	lampGroup.tick = function(delta) {
     if (this.userData.isPaused) {
         return;

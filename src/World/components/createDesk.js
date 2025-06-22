@@ -1,5 +1,6 @@
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial, SRGBColorSpace, TextureLoader, TorusGeometry } from "three";
+import { BoxGeometry, Group, Mesh} from "three";
 import { createMaterialNew } from "../util/createMeshWithTexture";
+import gsap from "gsap";
 
 function createDesk() {
     const tableTextureFiles = {
@@ -106,9 +107,36 @@ deskLegGroup.name = "DeskLegs";
 		drawer.userData.initialZPosition = drawer.position.z;
         drawer.userData.openDistance = DRAWER_OPEN_DISTANCE
 
+        // toggle the drawers
+        drawer.toggleDrawer = function() {
+        const isOpen = this.userData.isOpen; 
+        const initialZ = this.userData.initialZPosition;
+        const openDistance = this.userData.openDistance;
+
+        if (!isOpen) {
+            gsap.to(this.position, {
+                z: initialZ + openDistance,
+                duration: 0.5,
+                ease: "power2.out",
+                onComplete: () => {
+                    this.userData.isOpen = true;
+                }
+            });
+        } else {
+            gsap.to(this.position, {
+                z: initialZ,
+                duration: 0.5,
+                ease: "power2.out",
+                onComplete: () => {
+                    this.userData.isOpen = false;
+                }
+            });
+        }
+    }.bind(drawer);
         // drawer handles 
         const handleGeometry = new BoxGeometry(drawerWidth * 0.4, 0.1, 0.1);
-        const handle = new Mesh(handleGeometry, legDecor);
+        const handleTexture = legDecor.clone()
+        const handle = new Mesh(handleGeometry, handleTexture);
         handle.position.set(0, 0, drawerDepth / 2 + 0.05); 
 		  handle.userData.isDrawer = true;
         handle.userData.drawerMesh = drawer;

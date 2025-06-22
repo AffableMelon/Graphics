@@ -10,7 +10,8 @@ import { newLight } from "./components/lamp.js";
 import { createDesk } from "./components/createDesk.js";
 import { createFloor } from "./components/floor.js";
 import { Color } from "three";
-import gsap from "gsap";
+import { Raycast } from "./systems/Raycast.js";
+import { directPointLight } from "three/tsl";
 
 let camera;
 let scene;
@@ -40,14 +41,20 @@ class World {
 		scene.add(desk, lampGroup, floor, directionalLight, ambientLight);
 		loop.updateables.push(controls, lampGroup, directionalLight);
 		// loop.updateables.push(controls,lampGroup);
+
+		const raycastSystem = new Raycast(camera, scene, renderer.domElement);
 		const resizer = new Resizer(camera, renderer, container);
-		// scene.add(createAxesHelper(), createGridHelper());
+
+		raycastSystem.addInteractive(lampGroup);
+		raycastSystem.addInteractive(desk.getObjectByName("Desk_Drawer_1"))
+		raycastSystem.addInteractive(desk.getObjectByName("Desk_Drawer_2"))
 
 		this.desk = desk;
 		this.lampGroup = lampGroup;
 		this.spotLight = spotLight; // The actual light source for toggling
 		this.bulbMesh = lampGroup.getObjectByName("LightBulb"); // Get the bulb mesh by name
 		this.loop = loop
+		this.directionalLight = directionalLight
 
 		this._initPartInfoPanel();
 
@@ -76,6 +83,10 @@ class World {
         `;
 	}
 
+	toggleWorldLightAnimation(value) {
+		this.directionalLight.userData.isPaused = !value
+	}
+
 	toggleLight(lightMesh, targetState) {
 		this.spotLight.visible = targetState; // Toggle actual light source
 		// Update bulb mesh emissive color
@@ -86,7 +97,7 @@ class World {
 				lightMesh.material.emissive.setHex(lightMesh.userData.offStateEmmisiveHex || 0x000000); // Black for off
 			}
 		}
-		console.log('Light is now:', this.spotLight.visible ? 'ON' : 'OFF');
+		// console.log('Light is now:', this.spotLight.visible ? 'ON' : 'OFF');
 
 		if (this._onLightToggleCallback) {
 			this._onLightToggleCallback(this.spotLight.visible);
@@ -143,9 +154,9 @@ class World {
 	toggleLampAnimation(value) {
 		if (!value) {
 			this.lampGroup.userData.isPaused = true
-			const currentTime = performance.now() * 0.001;
-			this.lampGroup.userData.animationOffset = (currentTime - this.lampGroup.userData.lastFrameTime);
-			this.lampGroup.userData.lastFrameTime = currentTime;
+			// const currentTime = performance.now() * 0.001;
+			// this.lampGroup.userData.animationOffset = (currentTime - this.lampGroup.userData.lastFrameTime);
+			// this.lampGroup.userData.lastFrameTime = currentTime;
 		} else {
 			this.lampGroup.userData.isPaused = false
 		}
@@ -201,6 +212,10 @@ class World {
 
 	getControls() {
 		return controls;
+	}
+
+	getWorldLightState(){
+		return !this.directionalLight.userData.isPaused;
 	}
 
 

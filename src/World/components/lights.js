@@ -27,16 +27,33 @@ const shadowMapSize = 10; // Adjust this value to fit your scene content
 	directionalLight.height = height;
 	directionalLight.angle = 0;
 	directionalLight.speed = MathUtils.degToRad(15);
+	directionalLight.userData.isPaused = false
 
-	directionalLight.tick = (delta) => {
-		directionalLight.angle += delta * directionalLight.speed;
 
-		directionalLight.position.x = directionalLight.radius * Math.cos(directionalLight.angle);
-		directionalLight.position.z = directionalLight.radius * Math.sin(directionalLight.angle);
+directionalLight.tick = function(delta) {
+    if (this.userData.isPaused) {
+        return;
+    }
 
-		directionalLight.position.y = directionalLight.height;
-	}
+    if (this.userData.animationTime === undefined) {
+        this.userData.animationTime = 0;
+    }
 
+    this.userData.animationTime += delta;
+
+    const t = this.userData.animationTime;
+
+    this.angle = this.angle ?? 0;
+    this.speed = this.speed ?? 1;
+    this.radius = this.radius ?? 10;
+    this.height = this.height ?? 5;
+
+    this.angle += delta * this.speed;
+
+    this.position.x = this.radius * Math.cos(this.angle);
+    this.position.z = this.radius * Math.sin(this.angle);
+    this.position.y = this.height;
+};
 	return { directionalLight, ambientLight };
 }
 

@@ -10,6 +10,7 @@ const guiParams = {
 	lampIntensity: 5,
 	lampAnimation: true,
 	rotateCamera: false,
+	worldLightState: false,
 	cameraReset: () => { },
 };
 
@@ -23,13 +24,14 @@ function main() {
 	const desk = world.getDesk();
 	const controls = world.getControls();
 	const camera = world.getCamera();
+	const worldLigh = world.getWorldLightState()
 
-	setupGUI(world, desk, bulbMesh, pointLight, controls, camera);
+	setupGUI(world, desk, bulbMesh, pointLight, controls, camera, worldLigh);
 
 	world.start(); // Start the animation loop
 }
 
-function setupGUI(world, desk, bulbMesh, pointLight, controls, camera) {
+function setupGUI(world, desk, bulbMesh, pointLight, controls, camera, worldLigh) {
 	gui = new GUI();
 	/* 
 		The whole idea is instance the controllers then when something happens in the controls like 
@@ -44,6 +46,13 @@ function setupGUI(world, desk, bulbMesh, pointLight, controls, camera) {
 	guiParams.cameraReset = () => {
 		controls.reset();
 	};
+	guiParams.worldLightState = worldLigh;
+	// world light controls
+
+	const worldLightFolder = gui.addFolder("World Lighting");
+	worldLightFolder.add(guiParams, "worldLightState").name("World light animation on/off").onChange((value) => {
+		world.toggleWorldLightAnimation(value)
+	})
 
 	// lamp light stuff
 
