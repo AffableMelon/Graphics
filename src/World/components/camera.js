@@ -22,8 +22,8 @@ function createCamera() {
 
 		// Update position on XYZ plane
 		camera.position.x = Math.cos(orbitAngle) * orbitRadius;
-		camera.position.y = Math.abs(Math.sin(orbitAngle)) * (orbitRadius + 10 );
-		camera.position.z = Math.sin(orbitAngle) * (orbitRadius + 5);
+		camera.position.y = Math.abs(Math.sin(orbitAngle)) * orbitRadius;
+		camera.position.z = Math.sin(orbitAngle) * (orbitRadius) * 5;
 
 		camera.lookAt(0, 0, 0); // always look at the center
 	};
